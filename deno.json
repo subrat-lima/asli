@@ -1,0 +1,15 @@
+{
+  "tasks": {
+    "fmt": "deno fmt .",
+    "lint": "deno lint --fix",
+    "build": "deno run --allow-read --allow-write scripts/merge.js",
+    "setup": "deno run --allow-read --allow-write scripts/setup.js"
+  },
+  "fmt": {
+    "indentWidth": 2,
+    "lineWidth": 80,
+    "semiColons": true,
+    "singleQuote": false,
+    "useTabs": false
+  }
+}

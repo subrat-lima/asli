@@ -1,0 +1,9 @@
+#!/bin/sh
+
+echo "Cleaning code with Deno fmt..."
+deno fmt .
+
+echo "Checking for logic errors..."
+deno lint --fix || (echo "Linting failed! Fix your code before committing." && exit 1)
+
+git update-index --again
