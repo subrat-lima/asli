@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Asli",
+  "version": "0.0.1",
+  "description": "A browser extension to help people stay protected by identifying and categorizing official, unofficial and scam websites.",
+  "permissions": ["tabs"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Asli"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["data.min.json"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

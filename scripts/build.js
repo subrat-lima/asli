@@ -1,8 +1,15 @@
-import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { join } from "node:path";
 import { getMergedDataset } from "./merge.js";
 import process from "node:process";
 
+const SRC_DIR = "./src";
 const DIST_DIR = "./dist";
 
 function prepareOutputDirectory(path) {
@@ -17,12 +24,26 @@ function writeMinifiedData(targetPath) {
   writeFileSync(targetPath, JSON.stringify(dataset));
 }
 
+function transferStaticAssets(sourceDir, targetDir) {
+  const assets = ["manifest.json", "background.js"];
+
+  for (const file of assets) {
+    const srcPath = join(sourceDir, file);
+    const destPath = join(targetDir, file);
+
+    if (existsSync(srcPath)) {
+      copyFileSync(srcPath, destPath);
+    }
+  }
+}
+
 function main() {
   try {
     prepareOutputDirectory(DIST_DIR);
 
     const dataOutput = join(DIST_DIR, "data.min.json");
     writeMinifiedData(dataOutput);
+    transferStaticAssets(SRC_DIR, DIST_DIR);
     console.log("Build Success: /dist is ready.");
   } catch (error) {
     console.error("Build Failed: " + error.message);
