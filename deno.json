@@ -2,7 +2,7 @@
   "tasks": {
     "fmt": "deno fmt .",
     "lint": "deno lint --fix",
-    "build": "deno run --allow-read --allow-write scripts/merge.js",
+    "build": "deno run --allow-read --allow-write scripts/build.js",
     "setup": "deno run --allow-read --allow-write scripts/setup.js"
   },
   "fmt": {
