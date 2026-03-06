@@ -1,15 +1,15 @@
-import { copyFileSync, existsSync, mkdirSync, rmSync } from "node:fs";
-import { join } from "node:path";
-import process from "node:process";
+import { join } from "@std/path";
 
 const SRC_DIR = "./src";
 const DIST_DIR = "./dist";
 
 function prepareOutputDirectory(path) {
-  if (existsSync(path)) {
-    rmSync(path, { recursive: true, force: true });
+  try {
+    Deno.removeSync(path, { recursive: true });
+  } catch (error) {
+    if (!(error instanceof Deno.errors.NotFound)) throw error;
   }
-  mkdirSync(path);
+  Deno.mkdirSync(path, { recursive: true });
 }
 
 function transferStaticAssets(sourceDir, targetDir) {
@@ -26,15 +26,22 @@ function transferStaticAssets(sourceDir, targetDir) {
     const srcPath = join(sourceDir, file);
     const destPath = join(targetDir, file);
 
-    if (existsSync(srcPath)) {
-      copyFileSync(srcPath, destPath);
+    try {
+      Deno.copyFileSync(srcPath, destPath);
+    } catch (error) {
+      if (!(error instanceof Deno.errors.NotFound)) {
+        console.warn(`Could not copy ${file}: ${error.message}`);
+      }
     }
   }
 
   const iconDir = join(targetDir, "icons");
-  if (!existsSync(iconDir)) {
-    mkdirSync(iconDir, { recursive: true });
+  try {
+    Deno.mkdirSync(iconDir, { recursive: true });
+  } catch (error) {
+    if (!(error instanceof Deno.errors.AlreadyExists)) throw error;
   }
+
   const icons = [
     "icon.png",
     "icon16.png",
@@ -43,9 +50,12 @@ function transferStaticAssets(sourceDir, targetDir) {
     "icon128.png",
   ];
   for (const icon of icons) {
-    const iconFile = join(sourceDir, "icons", icon);
-    if (existsSync(iconFile)) {
-      copyFileSync(iconFile, join(iconDir, icon));
+    const srcPath = join(sourceDir, "icons", icon);
+    const destPath = join(iconDir, icon);
+    try {
+      Deno.copyFileSync(srcPath, destPath);
+    } catch (_error) {
+      // Icon might not exist, skip silently
     }
   }
 }
@@ -53,12 +63,11 @@ function transferStaticAssets(sourceDir, targetDir) {
 function main() {
   try {
     prepareOutputDirectory(DIST_DIR);
-
     transferStaticAssets(SRC_DIR, DIST_DIR);
     console.log("Build Success: /dist is ready.");
   } catch (error) {
     console.error("Build Failed: " + error.message);
-    process.exit(1);
+    Deno.exit(1);
   }
 }
 

@@ -1,25 +1,38 @@
 # asli
 
-A browser extension to help people stay protected by identifying and
-categorizing official, unofficial and scam websites.
+A browser extension to help common man stay protected by identifying and
+distinguishing between official, unofficial and scam websites.
 
 ## Data Structure
 
-- `data` folder contains the rules information.
-- `data/root` contain verified official authorities and government level
+- `data` folder contains the rule information.
+- `data/root` contains verified official authorities and government level
   domains.
-- `data/apps` contain third-party applications and organizations portals.
-- `data/dead` contain revoked, malicious and fradulent domains.
+- `data/apps` contains third-party applications and organizational portals.
+- `data/dead` contains revoked, malicious and fraudulent domains.
 
-## Development setup
+## Development Setup
 
-- [Install deno.](https://docs.deno.com/runtime/getting_started/installation/)
-- Run `deno task setup` to install the pre-commit hook.
-- Run `deno task build` to generate the build.
-- On chrome open `chrome://extensions`, enable developer mode, then load the
-  extension by selecting the `dist` folder.
+1. [Install Deno](https://docs.deno.com/runtime/getting_started/installation/).
+2. Run `deno task setup` to install the local pre-commit hooks.
+3. Run `deno task app` to build the extension assets.
+4. Run `deno task data` to generate the latest datasets.
 
-## Attibution
+To test the extension:
+
+- On Chrome: Open `chrome://extensions`, enable **Developer mode**, and click
+  **Load unpacked**. Select the `dist` folder.
+- On Firefox: Open `about:debugging#/runtime/this-firefox` and click **Load
+  Temporary Add-on**. Select the `dist/manifest.json`.
+
+## Versioning & Release
+
+This project uses an automated release workflow:
+
+- Run `deno task release [patch|minor|major]` to automatically bump versions,
+  commit, and trigger store deployments.
+
+## Attribution
 
 - [Icon](https://www.flaticon.com/free-icons/security)
 

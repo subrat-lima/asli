@@ -1,25 +1,25 @@
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { join } from "@std/path";
 import { getMergedDataset } from "./merge.js";
-import process from "node:process";
 
 const DIST_DIR = "./dist";
 
 function ensureOutputDirectory(path) {
-  if (!existsSync(path)) {
-    mkdirSync(path, { recursive: true });
+  try {
+    Deno.mkdirSync(path, { recursive: true });
+  } catch (error) {
+    if (!(error instanceof Deno.errors.AlreadyExists)) throw error;
   }
 }
 
 function writeMinifiedData(targetPath) {
   const dataset = getMergedDataset();
-  writeFileSync(targetPath, JSON.stringify(dataset));
+  Deno.writeTextFileSync(targetPath, JSON.stringify(dataset));
 }
 
 function writeMetadata(targetDir) {
   const timestampPath = join(targetDir, "metadata.json");
   const metadata = { timestamp: Date.now() };
-  writeFileSync(timestampPath, JSON.stringify(metadata));
+  Deno.writeTextFileSync(timestampPath, JSON.stringify(metadata));
 }
 
 function main() {
@@ -34,7 +34,7 @@ function main() {
     );
   } catch (error) {
     console.error("Data Build Failed: " + error.message);
-    process.exit(1);
+    Deno.exit(1);
   }
 }
 

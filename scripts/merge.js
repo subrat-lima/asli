@@ -1,5 +1,4 @@
-import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { join, parse } from "node:path";
+import { join, parse } from "@std/path";
 
 const DATA_DIR = "./data";
 const SCHEMA = { "dead": "red", "apps": "yellow", "root": "green" };
@@ -17,14 +16,17 @@ function getEntriesFromFolder(folderName) {
   const entries = [];
   const dirPath = join(DATA_DIR, folderName);
 
-  if (!existsSync(dirPath)) return entries;
+  try {
+    const dirInfo = Deno.statSync(dirPath);
+    if (!dirInfo.isDirectory) return entries;
+  } catch (_error) {
+    return entries;
+  }
 
-  const files = readdirSync(dirPath);
-
-  for (const file of files) {
-    if (file.endsWith(".json")) {
-      const raw = readFileSync(join(dirPath, file), "utf-8");
-      const parsed = parseFile(file, raw);
+  for (const entry of Deno.readDirSync(dirPath)) {
+    if (entry.isFile && entry.name.endsWith(".json")) {
+      const raw = Deno.readTextFileSync(join(dirPath, entry.name));
+      const parsed = parseFile(entry.name, raw);
       entries.push(parsed);
     }
   }
@@ -35,8 +37,7 @@ function getEntriesFromFolder(folderName) {
 export function getMergedDataset() {
   const dataset = {};
 
-  for (const folder in SCHEMA) {
-    const statusKey = SCHEMA[folder];
+  for (const [folder, statusKey] of Object.entries(SCHEMA)) {
     dataset[statusKey] = getEntriesFromFolder(folder);
   }
 

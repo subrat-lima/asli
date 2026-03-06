@@ -1,4 +1,7 @@
 {
+  "imports": {
+    "@std/path": "jsr:@std/path@1"
+  },
   "tasks": {
     "fmt": "deno fmt .",
     "lint": "deno lint --fix",

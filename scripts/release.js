@@ -1,16 +1,15 @@
-import { readFileSync, writeFileSync } from "node:fs";
-import { execSync } from "node:child_process";
-import process from "node:process";
-
 const MANIFEST_PATH = "./src/manifest.json";
 
 function getManifest() {
-  const content = readFileSync(MANIFEST_PATH, "utf-8");
+  const content = Deno.readTextFileSync(MANIFEST_PATH);
   return JSON.parse(content);
 }
 
 function saveManifest(manifest) {
-  writeFileSync(MANIFEST_PATH, JSON.stringify(manifest, null, 2) + "\n");
+  Deno.writeTextFileSync(
+    MANIFEST_PATH,
+    JSON.stringify(manifest, null, 2) + "\n",
+  );
 }
 
 function incrementVersion(version, type) {
@@ -28,34 +27,45 @@ function incrementVersion(version, type) {
   return parts.join(".");
 }
 
-function run(command) {
-  console.log(`> ${command}`);
-  try {
-    return execSync(command, { encoding: "utf-8", stdio: "inherit" });
-  } catch (_error) {
-    console.error(`Command failed: ${command}`);
-    process.exit(1);
+function run(cmd, args) {
+  const commandStr = `${cmd} ${args.join(" ")}`;
+  console.log(`> ${commandStr}`);
+  const command = new Deno.Command(cmd, {
+    args,
+    stdout: "inherit",
+    stderr: "inherit",
+  });
+
+  const { success } = command.outputSync();
+  if (!success) {
+    console.error(`Command failed: ${commandStr}`);
+    Deno.exit(1);
   }
 }
 
 function main() {
-  const type = process.argv[2] || "patch";
+  const type = Deno.args[0] || "patch";
   if (!["major", "minor", "patch"].includes(type)) {
     console.error("Usage: deno task release [major|minor|patch]");
-    process.exit(1);
+    Deno.exit(1);
   }
 
   // 1. Run checks
   console.log("Checking project status...");
-  run("deno task format");
+  run("deno", ["task", "format"]);
 
   // 2. Check for clean working tree
-  const status = execSync("git status --porcelain", { encoding: "utf-8" });
+  const gitStatusCmd = new Deno.Command("git", {
+    args: ["status", "--porcelain"],
+  });
+  const { stdout } = gitStatusCmd.outputSync();
+  const status = new TextDecoder().decode(stdout);
+
   if (status.trim().length > 0) {
     console.error(
       "Error: You have uncommitted changes. Please commit or stash them first.",
     );
-    process.exit(1);
+    Deno.exit(1);
   }
 
   // 3. Update version
@@ -68,14 +78,19 @@ function main() {
   saveManifest(manifest);
 
   // 4. Commit and Tag
-  run(`git add ${MANIFEST_PATH}`);
-  run(`git commit -m "chore: bump version to v${newVersion}"`);
-  run("git push origin main");
+  run("git", ["add", MANIFEST_PATH]);
+  run("git", ["commit", "-m", `chore: bump version to v${newVersion}`]);
+  run("git", ["push", "origin", "main"]);
 
   // 5. Create GitHub Release
-  run(
-    `gh release create v${newVersion} --title "Release v${newVersion}" --generate-notes`,
-  );
+  run("gh", [
+    "release",
+    "create",
+    `v${newVersion}`,
+    "--title",
+    `Release v${newVersion}`,
+    "--generate-notes",
+  ]);
 
   console.log(`\nSuccessfully released v${newVersion}!`);
 }
