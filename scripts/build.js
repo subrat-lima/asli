@@ -25,7 +25,14 @@ function writeMinifiedData(targetPath) {
 }
 
 function transferStaticAssets(sourceDir, targetDir) {
-  const assets = ["manifest.json", "background.js"];
+  const assets = [
+    "manifest.json",
+    "background.js",
+    "checker.js",
+    "blocked.html",
+    "blocked.css",
+    "blocked.js",
+  ];
 
   for (const file of assets) {
     const srcPath = join(sourceDir, file);

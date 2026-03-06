@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="blocked.css">
+  </head>
+
+  <body>
+    <main>
+      <h1>ASLI CHECK: ACCESS BLOCKED</h1>
+      <section>
+        <dl>
+          <dt>Hostname</dt>
+          <dd id="host"></dd>
+
+          <dt>Category</dt>
+          <dd id="category"></dd>
+
+          <dt>Why it is blocked</dt>
+          <dd id="reason"></dd>
+        </dl>
+
+        <p>
+          <strong>CONSEQUENCE:</strong> Proceeding may expose your credentials,
+          personal data, or system to malicious actors.
+        </p>
+      </section>
+      <footer>
+        <button id="exit">SAFE EXIT</button>
+        <button id="proceed" class="danger">I UNDERSTAND, CONTINUE</button>
+      </footer>
+    </main>
+
+    <script src="blocked.js"></script>
+  </body>
+</html>

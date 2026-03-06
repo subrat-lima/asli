@@ -1,9 +1,18 @@
+import { checkUrlStatus } from "./checker.js";
+
+const browserApi = globalThis.browser || globalThis.chrome;
 let dataset = { red: [], yellow: [], green: [] };
+
+const COLORS = {
+  red: "#FF0000",
+  yellow: "#FFD700",
+  green: "#008000",
+  unknown: "#808080",
+};
 
 async function loadDataset() {
   try {
-    const url = chrome.runtime.getURL("data.min.json");
-    const response = await fetch(url);
+    const response = await fetch(browserApi.runtime.getURL("data.min.json"));
     dataset = await response.json();
     console.log("Asli dataset loaded");
   } catch (error) {
@@ -11,60 +20,45 @@ async function loadDataset() {
   }
 }
 
-function isDomainMatch(hostname, domains) {
-  for (const domain of domains) {
-    if (hostname === domain || hostname.endsWith("." + domain)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function checkUrlStatus(url) {
-  try {
-    const hostname = new URL(url).hostname;
-
-    for (const entry of dataset.red) {
-      if (isDomainMatch(hostname, entry.d)) return "red";
-    }
-
-    for (const entry of dataset.yellow) {
-      if (isDomainMatch(hostname, entry.d)) return "yellow";
-    }
-
-    for (const entry of dataset.green) {
-      if (isDomainMatch(hostname, entry.d)) return "green";
-    }
-
-    return "unknown";
-  } catch (_e) {
-    return "unknown";
-  }
-}
-
 function updateUI(tabId, status) {
-  const colors = {
-    red: "#FF0000",
-    yellow: "#FFD700",
-    green: "#008000",
-    unknown: "#808080",
-  };
-
-  chrome.action.setBadgeBackgroundColor({
-    color: colors[status],
-    tabId: tabId,
+  browserApi.action.setBadgeBackgroundColor({
+    color: COLORS[status] || COLORS.unknown,
+    tabId,
   });
 
-  const label = status === "unknown" ? "" : "!";
-  chrome.action.setBadgeText({ text: label, tabId: tabId });
+  browserApi.action.setBadgeText({
+    text: status === "unknown" ? "" : "!",
+    tabId,
+  });
 }
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status === "complete" && tab.url) {
-    const status = checkUrlStatus(tab.url);
-    updateUI(tabId, status);
+function handleTabUpdate(tabId, url) {
+  const result = checkUrlStatus(url, dataset);
+  updateUI(tabId, result.status);
+
+  if (result.action === "block" || result.action === "notify") {
+    const hostname = new URL(url).hostname;
+    const params = new URLSearchParams({
+      host: hostname,
+      cat: result.category,
+      why: result.reason,
+      target: url,
+    });
+
+    const blockUrl = `${browserApi.runtime.getURL("blocked.html")}?${params}`;
+    browserApi.tabs.update(tabId, { url: blockUrl });
+  }
+}
+
+browserApi.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (!tab.url) return;
+
+  if (changeInfo.status === "loading") {
+    handleTabUpdate(tabId, tab.url);
+  } else if (changeInfo.status === "complete") {
+    updateUI(tabId, checkUrlStatus(tab.url, dataset).status);
   }
 });
 
-chrome.runtime.onInstalled.addListener(loadDataset);
-chrome.runtime.onStartup.addListener(loadDataset);
+browserApi.runtime.onInstalled.addListener(loadDataset);
+browserApi.runtime.onStartup.addListener(loadDataset);
