@@ -25,11 +25,10 @@ jobs:
         run: cd dist && zip -r ../asli-firefox.zip *
 
       - name: Deploy to Mozilla Add-ons (AMO)
-        uses: mozilla/web-ext-action@v1
+        uses: kewisch/action-web-ext@v1
         with:
-          extension-file: asli-firefox.zip
-          source-file: asli-firefox.zip
-          api-key: ${{ secrets.WEB_EXT_API_KEY }}
-          api-secret: ${{ secrets.WEB_EXT_API_SECRET }}
-          extension-id: asli@subrat.lima
-          dry-run: false
+          cmd: sign
+          source: asli-firefox.zip
+          apiKey: ${{ secrets.WEB_EXT_API_KEY }}
+          apiSecret: ${{ secrets.WEB_EXT_API_SECRET }}
+          channel: listed
