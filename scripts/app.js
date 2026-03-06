@@ -30,6 +30,15 @@ function transferStaticAssets(sourceDir, targetDir) {
       copyFileSync(srcPath, destPath);
     }
   }
+
+  const iconDir = join(targetDir, "icons");
+  if (!existsSync(iconDir)) {
+    mkdirSync(iconDir, { recursive: true });
+  }
+  const iconFile = join(sourceDir, "icons", "icon.png");
+  if (existsSync(iconFile)) {
+    copyFileSync(iconFile, join(iconDir, "icon.png"));
+  }
 }
 
 function main() {

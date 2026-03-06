@@ -19,6 +19,10 @@ categorizing official, unofficial and scam websites.
 - On chrome open `chrome://extensions`, enable developer mode, then load the
   extension by selecting the `dist` folder.
 
+## Attibution
+
+- [Icon](https://www.flaticon.com/free-icons/security)
+
 ## Reference
 
 - [gov.in domain guidelines](https://registry.gov.in/pdfdocs/Gov.In_Guidelines.pdf)
