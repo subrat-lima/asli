@@ -35,9 +35,18 @@ function transferStaticAssets(sourceDir, targetDir) {
   if (!existsSync(iconDir)) {
     mkdirSync(iconDir, { recursive: true });
   }
-  const iconFile = join(sourceDir, "icons", "icon.png");
-  if (existsSync(iconFile)) {
-    copyFileSync(iconFile, join(iconDir, "icon.png"));
+  const icons = [
+    "icon.png",
+    "icon16.png",
+    "icon32.png",
+    "icon48.png",
+    "icon128.png",
+  ];
+  for (const icon of icons) {
+    const iconFile = join(sourceDir, "icons", icon);
+    if (existsSync(iconFile)) {
+      copyFileSync(iconFile, join(iconDir, icon));
+    }
   }
 }
 
