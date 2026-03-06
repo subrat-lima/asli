@@ -41,9 +41,23 @@ distinguishing between official, unofficial and scam websites.
 
 ---
 
+## Contributing
+
+Contributions to the website database are welcome!
+
+- **Adding Domains**: To add or update a website, create a JSON file in the
+  appropriate `data/` sub-folder.
+- **Data Updates**: Pushing changes to the `data/` folder in the `main` branch
+  will automatically update the live database for all users without requiring a
+  new extension release.
+- **Code Changes**: For bug fixes or new features in the extension logic, please
+  submit a Pull Request.
+
+---
+
 ## Versioning & Release
 
-This project uses an automated release workflow:
+This project uses an automated release workflow for extension updates:
 
 - Run `deno task release [patch|minor|major]` to automatically bump versions,
   commit, and trigger store deployments.

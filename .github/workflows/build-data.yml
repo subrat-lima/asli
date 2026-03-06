@@ -33,4 +33,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
           publish_branch: gh-pages
-          commit_message: "choreBase: auto-publish generated data"
+          commit_message: "chore: auto-publish generated data"
