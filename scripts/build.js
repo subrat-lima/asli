@@ -24,6 +24,12 @@ function writeMinifiedData(targetPath) {
   writeFileSync(targetPath, JSON.stringify(dataset));
 }
 
+function writeMetadata(targetDir) {
+  const timestampPath = join(targetDir, "metadata.json");
+  const metadata = { timestamp: Date.now() };
+  writeFileSync(timestampPath, JSON.stringify(metadata));
+}
+
 function transferStaticAssets(sourceDir, targetDir) {
   const assets = [
     "manifest.json",
@@ -50,6 +56,7 @@ function main() {
 
     const dataOutput = join(DIST_DIR, "data.min.json");
     writeMinifiedData(dataOutput);
+    writeMetadata(DIST_DIR);
     transferStaticAssets(SRC_DIR, DIST_DIR);
     console.log("Build Success: /dist is ready.");
   } catch (error) {

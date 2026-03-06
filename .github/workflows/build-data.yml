@@ -1,0 +1,34 @@
+name: Build and Push Data Updates
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "data/**"
+      - "scripts/**"
+      - "src/**"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@main
+        with:
+          deno-version: v2.x
+
+      - name: Build Extension Data
+        run: deno task build
+
+      - name: Commit and Push dist/
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: auto-generate dist files"
+          file_pattern: "dist/*"
