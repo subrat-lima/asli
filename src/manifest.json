@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Asli",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A browser extension to help people stay protected by identifying and categorizing official, unofficial and scam websites.",
   "permissions": [
     "tabs",
