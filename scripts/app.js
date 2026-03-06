@@ -1,12 +1,5 @@
-import {
-  copyFileSync,
-  existsSync,
-  mkdirSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
-import { getMergedDataset } from "./merge.js";
 import process from "node:process";
 
 const SRC_DIR = "./src";
@@ -17,17 +10,6 @@ function prepareOutputDirectory(path) {
     rmSync(path, { recursive: true, force: true });
   }
   mkdirSync(path);
-}
-
-function writeMinifiedData(targetPath) {
-  const dataset = getMergedDataset();
-  writeFileSync(targetPath, JSON.stringify(dataset));
-}
-
-function writeMetadata(targetDir) {
-  const timestampPath = join(targetDir, "metadata.json");
-  const metadata = { timestamp: Date.now() };
-  writeFileSync(timestampPath, JSON.stringify(metadata));
 }
 
 function transferStaticAssets(sourceDir, targetDir) {
@@ -54,9 +36,6 @@ function main() {
   try {
     prepareOutputDirectory(DIST_DIR);
 
-    const dataOutput = join(DIST_DIR, "data.min.json");
-    writeMinifiedData(dataOutput);
-    writeMetadata(DIST_DIR);
     transferStaticAssets(SRC_DIR, DIST_DIR);
     console.log("Build Success: /dist is ready.");
   } catch (error) {

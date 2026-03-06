@@ -11,9 +11,9 @@ const COLORS = {
 };
 
 const GITHUB_SOURCE =
-  "https://raw.githubusercontent.com/subrat-lima/asli/main/dist/data.min.json";
+  "https://raw.githubusercontent.com/subrat-lima/asli/gh-pages/data.min.json";
 const GITHUB_METADATA_SOURCE =
-  "https://raw.githubusercontent.com/subrat-lima/asli/main/dist/metadata.json";
+  "https://raw.githubusercontent.com/subrat-lima/asli/gh-pages/metadata.json";
 
 async function loadLocalDataset() {
   try {

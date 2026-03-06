@@ -25,10 +25,12 @@ jobs:
           deno-version: v2.x
 
       - name: Build Extension Data
-        run: deno task build
+        run: deno task data
 
-      - name: Commit and Push dist/
-        uses: stefanzweifel/git-auto-commit-action@v5
+      - name: Deploy to Data Branch (gh-pages)
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          commit_message: "chore: auto-generate dist files"
-          file_pattern: "dist/*"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages
+          commit_message: "choreBase: auto-publish generated data"
