@@ -1,0 +1,5 @@
+{
+  "src": "npci",
+  "domains": ["npci.org.in", "bhimupi.org.in"],
+  "keywords": ["upi", "npci", "bhim", "payment"]
+}
