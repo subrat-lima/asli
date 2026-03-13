@@ -17,28 +17,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Deno
-        uses: denoland/setup-deno@main
-        with:
-          deno-version: v2.x
-
-      - name: Cache Deno Dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/deno
-          key: ${{ runner.os }}-deno-${{ hashFiles('deno.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-deno-
+        uses: actions/checkout@v6
 
       - name: Build Extension Data
-        run: deno task data
+        run: ./scripts/data.sh
 
-      - name: Deploy to Data Branch (gh-pages)
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-          publish_branch: gh-pages
-          commit_message: "chore: auto-publish generated data"
+      - name: Deploy to Data Branch
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          cp -r dist /tmp/deploy_data
+
+          git fetch origin gh-pages || true
+          git checkout --orphan gh-pages
+
+          git rm -rf .
+          cp -r /tmp/deploy_data/* .
+          git add .
+          git commit -m "update extension data"
+          git push --force origin gh-pages

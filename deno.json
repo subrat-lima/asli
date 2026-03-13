@@ -6,10 +6,10 @@
     "fmt": "deno fmt .",
     "lint": "deno lint --fix",
     "format": "deno fmt . && deno lint --fix",
-    "app": "deno run --allow-read --allow-write scripts/app.js",
-    "data": "deno run --allow-read --allow-write scripts/data.js",
-    "setup": "deno run --allow-read --allow-write scripts/setup.js",
-    "release": "deno run --allow-read --allow-write --allow-run scripts/release.js"
+    "app": "./scripts/app.sh",
+    "data": "./scripts/data.sh",
+    "setup": "./scripts/setup.sh",
+    "release": "./scripts/release.sh"
   },
   "fmt": {
     "indentWidth": 2,

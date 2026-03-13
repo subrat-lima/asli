@@ -9,25 +9,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Deno
-        uses: denoland/setup-deno@main
-        with:
-          deno-version: v2.x
-
-      - name: Cache Deno Dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/deno
-          key: ${{ runner.os }}-deno-${{ hashFiles('deno.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-deno-
+        uses: actions/checkout@v6
 
       - name: Build Extension
         run: |
-          deno task app
-          deno task data
+          ./scripts/app.sh
+          ./scripts/data.sh
 
       - name: Package to ZIP
         run: cd dist && zip -r ../asli-chrome.zip *
