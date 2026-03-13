@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="src/icons/icon.png" width="128" alt="Asli Logo">
+</p>
+
 # Asli
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/subrat-lima/asli)](https://github.com/subrat-lima/asli/releases)
@@ -8,10 +12,10 @@ distinguishing between official, unofficial and scam websites.
 
 ## Install
 
-- **Firefox**:
-  [Available on Add-ons Store](https://addons.mozilla.org/en-US/firefox/addon/asli/)
 - **Chrome**:
-  [Available on Web Store](https://chromewebstore.google.com/detail/asli/ddccfpeejambeenfjpkcabkcmkjnbogg)
+  [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/ddccfpeejambeenfjpkcabkcmkjnbogg.svg?label=Chrome%20Web%20Store&color=blue)](https://chromewebstore.google.com/detail/asli/ddccfpeejambeenfjpkcabkcmkjnbogg)
+- **Firefox**:
+  [![Firefox Add-ons Store](https://img.shields.io/amo/v/asli.svg?label=Firefox%20Add-ons&color=orange)](https://addons.mozilla.org/en-US/firefox/addon/asli/)
 
 ---
 
