@@ -3,27 +3,10 @@ import { checkUrlStatus } from "./checker.js";
 const browserApi = globalThis.browser || globalThis.chrome;
 let dataset = { red: [], yellow: [], green: [] };
 
-const COLORS = {
-  red: "#FF0000",
-  yellow: "#FFD700",
-  green: "#008000",
-  unknown: "#808080",
-};
-
 const GITHUB_SOURCE =
   "https://raw.githubusercontent.com/subrat-lima/asli/gh-pages/data.min.json";
 const GITHUB_METADATA_SOURCE =
   "https://raw.githubusercontent.com/subrat-lima/asli/gh-pages/metadata.json";
-
-async function loadLocalDataset() {
-  try {
-    const local = await fetch(browserApi.runtime.getURL("data.min.json"));
-    dataset = await local.json();
-    console.log("Local bundled dataset loaded.");
-  } catch (error) {
-    console.warn("Failed to load local dataset:", error);
-  }
-}
 
 async function getCachedStorageData() {
   try {
@@ -83,40 +66,61 @@ async function fetchAndCacheRemoteDataset(newMetaTimestamp) {
 }
 
 async function loadDataset() {
-  await loadLocalDataset();
-
-  const stored = await getCachedStorageData();
-  if (stored.dataset) {
-    dataset = stored.dataset;
-    console.log("Cached dataset loaded from local storage.");
-  }
-
-  if (isDataFresh(stored.lastFetchTime)) {
-    console.log("Dataset is fresh. Skipping remote fetch today.");
-    return;
-  }
-
-  const metaData = await checkRemoteMetadata(stored.metadataTimestamp);
-
-  if (!metaData.hasChanged) {
-    console.log(
-      "Remote dataset has not changed since last download. Skipping data fetch.",
+  try {
+    const localRes = await fetch(browserApi.runtime.getURL("data.min.json"));
+    const localMetaRes = await fetch(
+      browserApi.runtime.getURL("metadata.json"),
     );
-    await browserApi.storage.local.set({ lastFetchTime: Date.now() });
-    return;
-  }
+    const localDataset = await localRes.json();
+    const localMeta = await localMetaRes.json();
 
-  await fetchAndCacheRemoteDataset(metaData.newTimestamp);
+    const stored = await getCachedStorageData();
+
+    if (
+      stored.dataset && stored.metadataTimestamp &&
+      stored.metadataTimestamp > localMeta.timestamp
+    ) {
+      dataset = stored.dataset;
+      console.log("Cached dataset is newer than bundle. Using cache.");
+    } else {
+      dataset = localDataset;
+      console.log("Local bundle is newer (or equal). Using bundle.");
+      // Seed storage with bundled data if cache is old
+      if (
+        !stored.metadataTimestamp ||
+        localMeta.timestamp > stored.metadataTimestamp
+      ) {
+        await browserApi.storage.local.set({
+          dataset: localDataset,
+          metadataTimestamp: localMeta.timestamp,
+        });
+      }
+    }
+
+    if (isDataFresh(stored.lastFetchTime)) {
+      console.log("Dataset is fresh. Skipping remote fetch today.");
+      return;
+    }
+
+    const metaData = await checkRemoteMetadata(
+      stored.metadataTimestamp || localMeta.timestamp,
+    );
+
+    if (!metaData.hasChanged) {
+      console.log("Remote dataset has not changed. Skipping data fetch.");
+      await browserApi.storage.local.set({ lastFetchTime: Date.now() });
+      return;
+    }
+
+    await fetchAndCacheRemoteDataset(metaData.newTimestamp);
+  } catch (error) {
+    console.warn("Dataset loading failed:", error);
+  }
 }
 
-function updateUI(tabId, status) {
-  browserApi.action.setBadgeBackgroundColor({
-    color: COLORS[status] || COLORS.unknown,
-    tabId,
-  });
-
+function updateUI(tabId, _status) {
   browserApi.action.setBadgeText({
-    text: status === "unknown" ? "" : "!",
+    text: "",
     tabId,
   });
 }

@@ -11,53 +11,51 @@ const IGNORED_PROTOCOLS = [
 ];
 
 export function isDomainMatch(hostname, domains) {
+  const host = hostname.toLowerCase();
   for (let i = 0; i < domains.length; i++) {
-    const domain = domains[i];
-    if (hostname === domain) {
-      return true;
-    }
-    if (hostname.endsWith("." + domain)) {
-      return true;
-    }
+    const domain = domains[i].toLowerCase();
+    // Exact match
+    if (host === domain) return true;
+    // Subdomain match (ensure it matches .domain.tld or domain.tld)
+    if (host.endsWith("." + domain)) return true;
   }
   return false;
 }
 
 function extractKeywords(domains) {
   const keywords = [];
+  const twoPartTlds = [
+    "co.in",
+    "gov.in",
+    "nic.in",
+    "ac.in",
+    "res.in",
+    "edu.in",
+    "net.in",
+    "org.in",
+    "bank.in",
+  ];
 
   for (let i = 0; i < domains.length; i++) {
-    const domain = domains[i];
+    const domain = domains[i].toLowerCase();
     const parts = domain.split(".");
 
-    if (parts.length < 2) {
-      keywords.push(domain);
-      continue;
-    }
-
-    const secondToLast = parts[parts.length - 2];
-    let isTwoPartTld = false;
-
-    if (
-      secondToLast === "co" || secondToLast === "com" ||
-      secondToLast === "net" || secondToLast === "org" || secondToLast === "in"
-    ) {
-      isTwoPartTld = true;
-    }
+    if (parts.length < 2) continue;
 
     let mainIndex = parts.length - 2;
-    if (isTwoPartTld) {
-      mainIndex = parts.length - 3;
+    if (parts.length >= 3) {
+      const suffix = parts[parts.length - 2] + "." + parts[parts.length - 1];
+      if (twoPartTlds.includes(suffix)) {
+        mainIndex = parts.length - 3;
+      }
     }
 
     if (mainIndex >= 0) {
       keywords.push(parts[mainIndex]);
-    } else {
-      keywords.push(domain);
     }
   }
 
-  return keywords;
+  return [...new Set(keywords)];
 }
 
 function matchAnyKeyword(hostname, keywords) {
@@ -176,14 +174,24 @@ export function checkUrlStatus(url, dataset) {
 
     const phishingMatchGreen = getPhishingMatch(hostname, dataset.green);
     if (phishingMatchGreen) {
+      if (checkGreenList(hostname, dataset)) {
+        return { action: "allow", status: "green" };
+      }
+      console.log(
+        `[Asli] Flagged as Phishing (Green Keywords Match): ${hostname}`,
+      );
       return phishingMatchGreen;
     }
 
     const phishingMatchYellow = getPhishingMatch(hostname, dataset.yellow);
     if (phishingMatchYellow) {
+      console.log(
+        `[Asli] Flagged as Phishing (Yellow Keywords Match): ${hostname}`,
+      );
       return phishingMatchYellow;
     }
 
+    console.log(`[Asli] Domain allowed (Unknown): ${hostname}`);
     return { action: "allow", status: "unknown" };
   } catch (error) {
     console.error("Check error:", error);
