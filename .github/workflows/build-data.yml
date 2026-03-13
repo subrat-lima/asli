@@ -24,6 +24,14 @@ jobs:
         with:
           deno-version: v2.x
 
+      - name: Cache Deno Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/deno
+          key: ${{ runner.os }}-deno-${{ hashFiles('deno.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-deno-
+
       - name: Build Extension Data
         run: deno task data
 

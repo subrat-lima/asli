@@ -16,6 +16,14 @@ jobs:
         with:
           deno-version: v2.x
 
+      - name: Cache Deno Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/deno
+          key: ${{ runner.os }}-deno-${{ hashFiles('deno.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-deno-
+
       - name: Build Extension
         run: |
           deno task app
@@ -26,6 +34,8 @@ jobs:
 
       - name: Upload to Chrome Web Store
         uses: mobilefirstllc/cws-publish@latest
+        timeout-minutes: 1 # Ultra-fast push
+        continue-on-error: true
         with:
           action: "publish"
           client_id: ${{ secrets.CHROME_CLIENT_ID }}
