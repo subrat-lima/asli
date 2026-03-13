@@ -10,8 +10,8 @@ distinguishing between official, unofficial and scam websites.
 
 - **Firefox**:
   [Available on Add-ons Store](https://addons.mozilla.org/en-US/firefox/addon/asli/)
-  (Awaiting Review)
-- **Chrome**: [Available on Web Store](#) (Awaiting Review)
+- **Chrome**:
+  [Available on Web Store](https://chromewebstore.google.com/detail/asli/ddccfpeejambeenfjpkcabkcmkjnbogg)
 
 ---
 
